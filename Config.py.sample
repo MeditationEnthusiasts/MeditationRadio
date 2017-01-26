@@ -1,0 +1,39 @@
+'''
+This is all the configuration needed for running Meditation Radio.
+
+Probably don't commit this file.
+'''
+import os
+
+'''
+Absolute path to ffmpeg.
+'''
+FFMPEG_PATH = os.path.join("usr", "bin", "ffmpeg")
+
+'''
+Path(s) to the font config directory (Required for FFMPEG on Windows)
+'''
+FC_CONFIG_DIR = os.path.join("etc", "fonts")
+FONTCONFIG_FILE = os.path.join("etc", "fonts", "fonts.conf")
+FONTCONFIG_PATH = os.path.join("etc", "fonts")
+
+'''
+The font file to use.
+'''
+FONT_FILE = os.path.join("etc","fonts","arial.ttf")
+
+'''
+Where to dump the outputted files.
+'''
+OUTPUT_DIR = os.path.join("output")
+
+'''
+Input File - info about the files to convert.
+'''
+INPUT_FILE = os.path.join("input.csv")
+
+'''
+Path to the default album art to use if there is none.
+'''
+DEFAULT_ALBUM_ART = "DefaultAlbumArt.png"
+
