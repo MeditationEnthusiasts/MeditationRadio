@@ -45,7 +45,7 @@ for line in data.splitlines():
         i += 1
         continue
 
-    splitString = line.split(',')
+    splitString = line.split('\t')
     song = Song()
     song.FileName = os.path.join(rootDir, splitString[0])
     song.SongName = splitString[1]
@@ -88,14 +88,15 @@ for song in SongList:
         '[0:a]showwaves=s=1280x200:mode=line[waves];' + \
         '[0:a]avectorscope=m=lissajous:s=600x600:draw=line[vs];' + \
         '[1:v]setpts=PTS-STARTPTS, scale=300x300[albumArt];' + \
-        '[2:v]setpts=PTS-STARTPTS, scale=443x180[xlogo];' + \
+        '[2:v]setpts=PTS-STARTPTS, scale=482x191[xlogo];' + \
         '[base][waves]overlay=shortest=1:x=10:y=560[tmp0];' + \
         '[tmp0][vs]overlay=shortest=1:x=500:y=10[tmp1];' + \
         '[tmp1][albumArt]overlay=shortest=1:x=10:y=300[tmp2];' + \
-        '[tmp2][xlogo]overlay=shortest=1:x=10:y=10[tmp3];' + \
-        '[tmp3]drawtext=fontfile=' + escaptedFontFile + ":fontsize=20:fontcolor=yellow:x=10:y=195:text='https\\://meditationenthusiasts.org/'[tmp4];" +\
-        '[tmp4]drawtext=fontfile=' + escaptedFontFile + ":fontsize=24:fontcolor=white:x=10:y=270:text='Now Playing\\:'[tmp5];" + \
-        '[tmp5]drawtext=fontfile=' + escaptedFontFile + ":box=1:boxcolor=black:fontsize=24:fontcolor=white:x=10:y=610:boxborderw=10:textfile='info.txt'[out]",
+        '[tmp2]drawtext=fontfile=' + escaptedFontFile + ":fontsize=20:fontcolor=yellow:x=10:y=215:text='https\\://meditationenthusiasts.org/'[tmp3];" +\
+        '[tmp3]drawtext=fontfile=' + escaptedFontFile + ":fontsize=24:fontcolor=white:x=10:y=270:text='Now Playing\\:'[tmp4];" + \
+        '[tmp4]drawtext=fontfile=' + escaptedFontFile + ":box=1:boxcolor=black:fontsize=24:fontcolor=white:x=10:y=610:boxborderw=10:textfile='info.txt'[tmp5];" + \
+        '[tmp5]drawtext=fontfile=' + escaptedFontFile + ":fix_bounds=1:box=1:boxcolor=black:fontsize=16:fontcolor=white:x=w-mod(t*(w+tw)/30.0\,(w+tw)):y=15:boxborderw=10:text='" + song.AttributionInfo.replace(":", "\\:") + "'[tmp6];" + \
+        '[tmp6][xlogo]overlay=shortest=1:x=-2:y=10[out]',
         "-map", '[out]',
         "-map", "0:a",
         "-vcodec", "libx264",
