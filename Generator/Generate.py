@@ -46,7 +46,7 @@ for line in data.splitlines():
         i += 1
         continue
 
-    splitString = line.split('\t')
+    splitString = line.split(',')
     song = Song()
     song.FileName = os.path.join(rootDir, splitString[0])
     song.SongName = splitString[1]
@@ -140,8 +140,12 @@ for song in SongList:
 
         time.sleep(0.5)
 
-    proc.stdin.write(b"q")
-    proc.stdin.flush()
+    try:
+        proc.stdin.write(b"q")
+        proc.stdin.flush()
+    except:
+        pass
+
     success = proc.wait()
 
     if (success != 0):
