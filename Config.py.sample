@@ -37,3 +37,7 @@ Path to the default album art to use if there is none.
 '''
 DEFAULT_ALBUM_ART = "DefaultAlbumArt.png"
 
+'''
+STREAMING ADDRESS
+'''
+STREAM_ADDRESS = "rtmp://live.twitch.tv/app/<stream key>"

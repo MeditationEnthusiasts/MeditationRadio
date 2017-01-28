@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import time
 
 sys.path.append("..")
 
@@ -13,7 +14,7 @@ class Song:
         self.Album = ""
         self.AlbumArt = ""
         self.Artist = ""
-        self.DownloadLine = ""
+        self.DownloadLink = ""
         self.License = ""
         self.Minutes = -1
         self.Seconds = -1
@@ -51,11 +52,14 @@ for line in data.splitlines():
     song.SongName = splitString[1]
     song.Album = splitString[2]
     song.Artist = splitString[3]
-    song.DownloadLine = splitString[4]
+    song.DownloadLink = splitString[4]
     song.License = splitString[5]
     song.Minutes = splitString[6]
     song.Seconds = splitString[7]
     song.AttributionInfo=splitString[8]
+
+    if (song.AttributionInfo == ""):
+        song.AttributionInfo = song.SongName + " by " + song.Artist + ". Licensed under " + song.License + ". " + song.DownloadLink
 
     albumArtPath = os.path.join(os.path.basename(song.FileName), "AlbumArt.jpg")
     if (os.path.exists(albumArtPath) and os.path.isfile(albumArtPath)):
@@ -77,6 +81,8 @@ for song in SongList:
 
     # Need to escape C:\ in Windows (ffmpeg uses : as arg separators).
     escaptedFontFile = FONT_FILE.replace(":", "\\\\:")
+
+    outputFile = os.path.join(OUTPUT_DIR, song.SongName + ".flv")
 
     ffmpegArgs = [
         FFMPEG_PATH,
@@ -108,13 +114,35 @@ for song in SongList:
         "-b:a", "128k",
         "-ac", "2",
         "-ar", "44100",
-        "-shortest", os.path.join(OUTPUT_DIR, song.SongName + ".flv")
+        "-shortest", outputFile
     ]
 
     print("Converting " + song.SongName )
-    success = subprocess.call(ffmpegArgs)
+    proc = subprocess.Popen(ffmpegArgs, stdin = subprocess.PIPE)
+
+    ###
+    # FFMPEG sometimes won't exit.
+    # If the file size doesn't change, send the exit command.
+    ###
+    sameCount = 0
+    lastSize = 0
+    while sameCount < 5:
+        if (os.path.exists(outputFile) == False):
+            continue
+
+        currentSize = os.path.getsize(outputFile)
+        if (currentSize == lastSize):
+            sameCount += 1
+        else:
+            sameCount = 0
+
+        lastSize = currentSize
+
+        time.sleep(0.5)
+
+    proc.stdin.write(b"q")
+    proc.stdin.flush()
+    success = proc.wait()
 
     if (success != 0):
         print ("Could not convert " + song.SongName)
-
-    exit(0)
