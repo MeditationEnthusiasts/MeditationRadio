@@ -1,3 +1,4 @@
+import csv
 import os
 import subprocess
 import sys
@@ -32,42 +33,41 @@ elif(os.path.isdir(OUTPUT_DIR) == False):
     raise NotADirectoryError(OUTPUT_DIR + " already exists, but is not a directory.  Abort")
 
 # Parse CSV
-with open(INPUT_FILE, 'r') as inFile:
-    data = inFile.read()
 
 rootDir = os.path.dirname(INPUT_FILE)
 
 SongList = []
 
-i = 0
-for line in data.splitlines():
-    # Skip the first two lines
-    if (i < 2):
-        i += 1
-        continue
+with open(INPUT_FILE, 'r') as inFile:
+    dictReader = csv.DictReader(inFile, fieldnames=["File Name", "Song Name", "Album", "Artist", "Download Link", "License", "Minutes", "Seconds", "Attribution Info"])
 
-    splitString = line.split(',')
-    song = Song()
-    song.FileName = os.path.join(rootDir, splitString[0])
-    song.SongName = splitString[1]
-    song.Album = splitString[2]
-    song.Artist = splitString[3]
-    song.DownloadLink = splitString[4]
-    song.License = splitString[5]
-    song.Minutes = splitString[6]
-    song.Seconds = splitString[7]
-    song.AttributionInfo=splitString[8]
+    i = 0
+    for line in dictReader:
+        # Skip the first line (Which is just the title of the columns)
+        if (i < 1):
+            i += 1
+            continue
 
-    if (song.AttributionInfo == ""):
-        song.AttributionInfo = song.SongName + " by " + song.Artist + ". Licensed under " + song.License + ". " + song.DownloadLink
+        song = Song()
+        song.FileName = os.path.join(rootDir, line["File Name"])
+        song.SongName = line["Song Name"]
+        song.Album = line["Album"]
+        song.Artist = line["Artist"]
+        song.DownloadLink = line["Download Link"]
+        song.License = line["License"]
+        song.Minutes = line["Minutes"]
+        song.Seconds = line["Seconds"]
+        song.AttributionInfo=line["Attribution Info"]
+        if (song.AttributionInfo == ""):
+            song.AttributionInfo = song.SongName + " by " + song.Artist + ". Licensed under " + song.License + ". " + song.DownloadLink
 
-    albumArtPath = os.path.join(os.path.basename(song.FileName), "AlbumArt.jpg")
-    if (os.path.exists(albumArtPath) and os.path.isfile(albumArtPath)):
-        song.AlbumArt = albumArtPath
-    else:
-        song.AlbumArt = DEFAULT_ALBUM_ART
+        albumArtPath = os.path.join(os.path.dirname(song.FileName), "AlbumArt.jpg")
+        if (os.path.exists(albumArtPath) and os.path.isfile(albumArtPath)):
+            song.AlbumArt = albumArtPath
+        else:
+            song.AlbumArt = DEFAULT_ALBUM_ART
 
-    SongList += [song]
+        SongList += [song]
 
 for song in SongList:
 
@@ -82,7 +82,7 @@ for song in SongList:
     # Need to escape C:\ in Windows (ffmpeg uses : as arg separators).
     escaptedFontFile = FONT_FILE.replace(":", "\\\\:")
 
-    outputFile = os.path.join(OUTPUT_DIR, song.SongName + ".flv")
+    outputFile = os.path.join(OUTPUT_DIR, song.SongName.replace("(", "_").replace(")", "_") + ".flv")
 
     ffmpegArgs = [
         FFMPEG_PATH,
@@ -101,7 +101,7 @@ for song in SongList:
         '[tmp2]drawtext=fontfile=' + escaptedFontFile + ":fontsize=20:fontcolor=yellow:x=10:y=215:text='https\\://meditationenthusiasts.org/'[tmp3];" +\
         '[tmp3]drawtext=fontfile=' + escaptedFontFile + ":fontsize=24:fontcolor=white:x=10:y=270:text='Now Playing\\:'[tmp4];" + \
         '[tmp4]drawtext=fontfile=' + escaptedFontFile + ":box=1:boxcolor=black:fontsize=24:fontcolor=white:x=10:y=610:boxborderw=10:textfile='info.txt'[tmp5];" + \
-        '[tmp5]drawtext=fontfile=' + escaptedFontFile + ":fix_bounds=1:box=1:boxcolor=black:fontsize=16:fontcolor=white:x=w-mod(t*(w+tw)/30.0\,(w+tw)):y=15:boxborderw=10:text='" + song.AttributionInfo.replace(":", "\\:") + "'[tmp6];" + \
+        '[tmp5]drawtext=fontfile=' + escaptedFontFile + ":fix_bounds=1:box=1:boxcolor=black:expansion=none:fontsize=16:fontcolor=white:x=w-mod(t*(w+tw)/30.0\,(w+tw)):y=15:boxborderw=10:text='" + song.AttributionInfo.replace(":", "\\:") + "'[tmp6];" + \
         '[tmp6][xlogo]overlay=shortest=1:x=-2:y=10[out]',
         "-map", '[out]',
         "-map", "0:a",
