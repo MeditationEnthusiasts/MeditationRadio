@@ -101,7 +101,7 @@ for song in SongList:
         '[tmp2]drawtext=fontfile=' + escaptedFontFile + ":fontsize=20:fontcolor=yellow:x=10:y=215:text='https\\://meditationenthusiasts.org/'[tmp3];" +\
         '[tmp3]drawtext=fontfile=' + escaptedFontFile + ":fontsize=24:fontcolor=white:x=10:y=270:text='Now Playing\\:'[tmp4];" + \
         '[tmp4]drawtext=fontfile=' + escaptedFontFile + ":box=1:boxcolor=black:fontsize=24:fontcolor=white:x=10:y=610:boxborderw=10:textfile='info.txt'[tmp5];" + \
-        '[tmp5]drawtext=fontfile=' + escaptedFontFile + ":fix_bounds=1:box=1:boxcolor=black:expansion=none:fontsize=16:fontcolor=white:x=w-mod(t*(w+tw)/30.0\,(w+tw)):y=15:boxborderw=10:text='" + song.AttributionInfo.replace(":", "\\:") + "'[tmp6];" + \
+        '[tmp5]drawtext=fontfile=' + escaptedFontFile + ":fix_bounds=1:box=1:boxcolor=black:expansion=none:fontsize=32:fontcolor=white:x=w-mod(t*(w+tw)/30.0\,(w+tw)):y=15:boxborderw=10:text='" + song.AttributionInfo.replace(":", "\\:") + "'[tmp6];" + \
         '[tmp6][xlogo]overlay=shortest=1:x=-2:y=10[out]',
         "-map", '[out]',
         "-map", "0:a",
